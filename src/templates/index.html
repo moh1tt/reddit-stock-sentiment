@@ -1,98 +1,134 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+    <meta charset="UTF-8" />
     <title>Reddit Stock Sentiment Analyzer</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 30px;
+            background-color: #121212;
+            color: #e0e0e0;
         }
 
-        .form-group {
-            margin-bottom: 20px;
+        h1,
+        h2,
+        h3 {
+            color: #00ff90;
+        }
+
+        a {
+            color: #ffffff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
         }
 
         input[type="text"] {
-            padding: 8px;
-            width: 200px;
+            padding: 10px;
+            width: 240px;
+            border: 1px solid #00ff90;
+            background-color: #1e1e1e;
+            color: #fff;
+            border-radius: 4px;
         }
 
         button {
-            padding: 8px 16px;
-            background-color: #007bff;
-            color: white;
+            padding: 10px 20px;
+            background-color: #00ff90;
+            color: #121212;
             border: none;
             border-radius: 4px;
             cursor: pointer;
+            margin-left: 10px;
+            font-weight: bold;
         }
 
         button:hover {
-            background-color: #0056b3;
+            background-color: #00c784;
         }
 
         #results {
-            margin-top: 20px;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-
-        .error {
-            color: red;
-        }
-
-        .success {
-            color: green;
+            margin-top: 30px;
+            padding: 25px;
+            background-color: #1e1e1e;
+            border: 1px solid #2f2f2f;
+            border-radius: 8px;
         }
 
         .loading {
-            color: #666;
             font-style: italic;
+            color: #bbbbbb;
+        }
+
+        .error {
+            color: #ff6b6b;
+        }
+
+        .success {
+            color: #ffffff;
+        }
+
+        .form-group {
+            margin-bottom: 30px;
         }
 
         .post {
-            margin: 15px 0;
-            padding: 15px;
-            border: 1px solid #eee;
-            border-radius: 4px;
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #181818;
+            border-left: 5px solid #555;
+            border-radius: 6px;
         }
 
         .post-title {
+            font-size: 1.1em;
             font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .post-meta {
-            font-size: 0.8em;
-            color: #666;
+            font-size: 0.9em;
+            color: #aaaaaa;
             margin-bottom: 10px;
         }
 
         .post-text {
             margin-top: 10px;
-            white-space: pre-wrap;
+            line-height: 1.6;
         }
 
         .sentiment-summary {
-            margin: 20px 0;
-            padding: 15px;
-            background-color: #f8f9fa;
-            border-radius: 4px;
+            background-color: #1c1c1c;
+            border: 1px solid #2f2f2f;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
         }
 
         .post.positive {
-            border-left: 4px solid #28a745;
+            border-left: 5px solid #00ff90;
         }
 
         .post.negative {
-            border-left: 4px solid #dc3545;
+            border-left: 5px solid #ff4c4c;
         }
 
         .post.neutral {
-            border-left: 4px solid #ffc107;
+            border-left: 5px solid #ffc107;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 5px;
         }
     </style>
 </head>
@@ -102,7 +138,7 @@
 
     <div class="form-group">
         <form id="stockForm">
-            <input type="text" id="stockSymbol" placeholder="Enter stock symbol (e.g., AAPL)" required>
+            <input type="text" id="stockSymbol" placeholder="Enter stock symbol (e.g., AAPL)" required />
             <button type="submit">Analyze</button>
         </form>
     </div>
@@ -132,37 +168,27 @@
                     return;
                 }
 
-                let html = '<div class="success">';
-                html += `<h2>Analysis Results for ${data.stock_symbol}</h2>`;
+                let html = `<div class="success"><h2>Analysis Results for ${data.stock_symbol}</h2>`;
 
                 if (data.sentiment.success) {
-                    // Sentiment Summary
                     html += '<div class="sentiment-summary">';
                     html += '<h3>Sentiment Analysis</h3>';
                     html += `<p>Average Sentiment: ${(data.sentiment.average_sentiment * 100).toFixed(1)}%</p>`;
                     html += `<p>Total Posts Analyzed: ${data.sentiment.post_count}</p>`;
-                    html += '<p>Sentiment Distribution:</p>';
-                    html += '<ul>';
-                    const distribution = data.sentiment.sentiment_distribution;
-                    html += `<li>Positive: ${distribution.positive || 0}</li>`;
-                    html += `<li>Neutral: ${distribution.neutral || 0}</li>`;
-                    html += `<li>Negative: ${distribution.negative || 0}</li>`;
-                    html += '</ul>';
-                    html += '</div>';
+                    html += '<p>Sentiment Distribution:</p><ul>';
+                    const dist = data.sentiment.sentiment_distribution;
+                    html += `<li>Positive: ${dist.positive || 0}</li>`;
+                    html += `<li>Neutral: ${dist.neutral || 0}</li>`;
+                    html += `<li>Negative: ${dist.negative || 0}</li>`;
+                    html += '</ul></div>';
 
-                    // Top Posts
                     html += '<h3>Top Reddit Posts</h3>';
                     data.sentiment.top_posts.forEach(post => {
                         const sentimentClass = post.sentiment > 0 ? 'positive' : (post.sentiment < 0 ? 'negative' : 'neutral');
                         html += `<div class="post ${sentimentClass}">`;
                         html += `<div class="post-title"><a href="${post.url}" target="_blank">${post.title}</a></div>`;
-                        html += `<div class="post-meta">`;
-                        html += `Posted in r/${post.subreddit} on ${post.created_utc}`;
-                        html += `<br>Score: ${post.score} | Sentiment: ${(post.sentiment * 100).toFixed(1)}%`;
-                        html += `</div>`;
-                        if (post.text) {
-                            html += `<div class="post-text">${post.text}</div>`;
-                        }
+                        html += `<div class="post-meta">Posted in r/${post.subreddit} on ${post.created_utc}<br>Score: ${post.score} | Sentiment: ${(post.sentiment * 100).toFixed(1)}%</div>`;
+                        if (post.text) html += `<div class="post-text">${post.text}</div>`;
                         html += '</div>';
                     });
                 } else {
