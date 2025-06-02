@@ -2,6 +2,8 @@
 
 An interactive sentiment analysis tool that extracts and analyzes stock-related discussions from Reddit. It leverages NLP and sentiment scoring to reveal public opinion trends on tickers like AAPL, TSLA, or any stock symbol in real time.
 
+![home screen](reddit-stock-analyzer.png)
+
 ---
 
 ## 🔍 What It Does
